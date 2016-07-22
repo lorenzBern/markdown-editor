@@ -13,8 +13,6 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Lorenz Pfisterer, Webruler
@@ -31,16 +29,16 @@ public class Wrapper {
         try (Reader rdr = new InputStreamReader(Wrapper.class.getClassLoader().getResourceAsStream("marked.js"))) {
             engine.eval(rdr);
             invocable = (Invocable) engine;
-        } catch (IOException | ScriptException xep) {
-            // Shouldn't happen since the file is build into the JAR.
-            Logger.getLogger(Wrapper.class.getName()).log(Level.SEVERE, null, xep);
+        } catch (IOException | ScriptException e) {
+            System.out.println("Error: " + e.getLocalizedMessage());
+            System.exit(0);
         }
         try (Reader rdr = new InputStreamReader(Wrapper.class.getClassLoader().getResourceAsStream("wrapper.js"))) {
             engine.eval(rdr);
             invocable = (Invocable) engine;
-        } catch (IOException | ScriptException xep) {
-            // Shouldn't happen since the file is build into the JAR.
-            Logger.getLogger(Wrapper.class.getName()).log(Level.SEVERE, null, xep);
+        } catch (IOException | ScriptException e) {
+            System.out.println("Error: " + e.getLocalizedMessage());
+            System.exit(0);
         }
 
     }
@@ -48,9 +46,8 @@ public class Wrapper {
     public String render(String input) {
         try {
             return invocable.invokeFunction("marked", input).toString();
-        } catch (NoSuchMethodException | ScriptException ex) {
-            Logger.getLogger(Wrapper.class.getName()).log(Level.SEVERE, null, ex);
-            return "error";
+        } catch (NoSuchMethodException | ScriptException e) {
+            return "Error: " + e.getLocalizedMessage();
         }
     }
 
