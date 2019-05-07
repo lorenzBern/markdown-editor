@@ -5,8 +5,6 @@ import ch.webruler.app.markdown.util.Wrapper;
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
@@ -19,6 +17,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -92,6 +91,18 @@ public class MarkDownEditor extends Application {
 			}
 		});
 
+		//Open given files
+		Parameters parameters = getParameters();
+		List<String> args = parameters.getRaw();
+		if (args.size() > 0) {
+			for (String fileName : args) {
+				File file = new File(fileName);
+				if (file.exists()) {
+					openFile(file);
+				}
+			}
+		}
+
 		stage.setTitle("Markdown Editor");
 		stage.setScene(scene);
 		stage.show();
@@ -141,20 +152,24 @@ public class MarkDownEditor extends Application {
 					return;
 				}
 			}
-			final Tab tab = new Tab();
-			tab.getProperties().put(FILE, file);
-			tab.getProperties().put(CHANGED, Boolean.FALSE);
-			tab.setOnCloseRequest((closeEvent) -> {
-				if ((Boolean) tab.getProperties().get(CHANGED)) {
-					askToSaveFiles(Arrays.asList(tab));
-				}
-			});
-			try {
-				String fileContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-				createTabContent(tab, file.getName(), fileContent);
-			} catch (IOException e) {
-				createTabContent(tab, file.getName(), "Error loading file\n" + e.getLocalizedMessage());
+			openFile(file);
+		}
+	}
+
+	private void openFile(File file) {
+		final Tab tab = new Tab();
+		tab.getProperties().put(FILE, file);
+		tab.getProperties().put(CHANGED, Boolean.FALSE);
+		tab.setOnCloseRequest((closeEvent) -> {
+			if ((Boolean) tab.getProperties().get(CHANGED)) {
+				askToSaveFiles(Arrays.asList(tab));
 			}
+		});
+		try {
+			String fileContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+			createTabContent(tab, file.getName(), fileContent);
+		} catch (IOException e) {
+			createTabContent(tab, file.getName(), "Error loading file\n" + e.getLocalizedMessage());
 		}
 	}
 
