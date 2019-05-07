@@ -144,6 +144,7 @@ public class MarkDownEditor extends Application {
 
 	private void onOpen(ActionEvent event) {
 		File file = fileChooser.showOpenDialog(null);
+		fileChooser.setInitialDirectory(file.getParentFile());
 		if (file != null) {
 			file = file.getAbsoluteFile();
 			for (Tab t : tabPane.getTabs()) {
@@ -179,7 +180,6 @@ public class MarkDownEditor extends Application {
 		createTabContent(tab, NEW_FILE, "");
 	}
 
-
 	private void onSave(ActionEvent event) {
 		save();
 	}
@@ -193,6 +193,7 @@ public class MarkDownEditor extends Application {
 		if ((Boolean) tab.getProperties().get(CHANGED)) {
 			if (tab.getText().equals(NEW_FILE)) {
 				File file = fileChooser.showOpenDialog(null);
+				fileChooser.setInitialDirectory(file.getParentFile());
 				if (file != null) {
 					saveContentToFile(tab, file);
 					tab.getProperties().put(FILE, file);
