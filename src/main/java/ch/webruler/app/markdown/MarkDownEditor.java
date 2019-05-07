@@ -195,6 +195,7 @@ public class MarkDownEditor extends Application {
 				File file = fileChooser.showOpenDialog(null);
 				if (file != null) {
 					saveContentToFile(tab, file);
+					tab.getProperties().put(FILE, file);
 				}
 			} else {
 				File file = (File) tab.getProperties().get(FILE);
