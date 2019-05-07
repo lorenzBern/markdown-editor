@@ -18,10 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -91,6 +88,16 @@ public class MarkDownEditor extends Application {
 			}
 		});
 
+		File markdownCheatsheet = initHomeDirectory();
+		openFile(markdownCheatsheet);
+		openInitialFiles();
+
+		stage.setTitle("Markdown Editor");
+		stage.setScene(scene);
+		stage.show();
+	}
+
+	private void openInitialFiles() {
 		//Open given files
 		Parameters parameters = getParameters();
 		List<String> args = parameters.getRaw();
@@ -102,10 +109,27 @@ public class MarkDownEditor extends Application {
 				}
 			}
 		}
+	}
 
-		stage.setTitle("Markdown Editor");
-		stage.setScene(scene);
-		stage.show();
+	private File initHomeDirectory() {
+		File markdownSheet = null;
+		File home = new File(System.getProperty("user.home"));
+		if (home.exists()) {
+			File appFolder = new File(home, ".ch.webruler.app.markdown.MarkDownEditor");
+			if (!appFolder.exists()) {
+				appFolder.mkdir();
+			}
+			markdownSheet = new File(appFolder, "Markdown-Cheatsheet.md");
+			if (!markdownSheet.exists()) {
+				InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Markdown-Cheatsheet.md");
+				try {
+					Files.copy(inputStream, markdownSheet.toPath());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return markdownSheet;
 	}
 
 	@Override
