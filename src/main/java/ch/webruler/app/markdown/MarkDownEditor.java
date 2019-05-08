@@ -89,7 +89,7 @@ public class MarkDownEditor extends Application {
 		});
 
 		File markdownCheatsheet = initHomeDirectory();
-		openFile(markdownCheatsheet);
+		openFile(markdownCheatsheet, true);
 		openInitialFiles();
 
 		stage.setTitle("Markdown Editor");
@@ -102,10 +102,12 @@ public class MarkDownEditor extends Application {
 		Parameters parameters = getParameters();
 		List<String> args = parameters.getRaw();
 		if (args.size() > 0) {
+			boolean first = true;
 			for (String fileName : args) {
 				File file = new File(fileName);
 				if (file.exists()) {
-					openFile(file);
+					openFile(file, first);
+					first = false;
 				}
 			}
 		}
@@ -168,7 +170,6 @@ public class MarkDownEditor extends Application {
 
 	private void onOpen(ActionEvent event) {
 		File file = fileChooser.showOpenDialog(null);
-		fileChooser.setInitialDirectory(file.getParentFile());
 		if (file != null) {
 			file = file.getAbsoluteFile();
 			for (Tab t : tabPane.getTabs()) {
@@ -177,11 +178,14 @@ public class MarkDownEditor extends Application {
 					return;
 				}
 			}
-			openFile(file);
+			openFile(file, true);
 		}
 	}
 
-	private void openFile(File file) {
+	private void openFile(File file, boolean persistFolder) {
+		if (persistFolder) {
+			persistFolder(file);
+		}
 		final Tab tab = new Tab();
 		tab.getProperties().put(FILE, file);
 		tab.getProperties().put(CHANGED, Boolean.FALSE);
@@ -196,6 +200,10 @@ public class MarkDownEditor extends Application {
 		} catch (IOException e) {
 			createTabContent(tab, file.getName(), "Error loading file\n" + e.getLocalizedMessage());
 		}
+	}
+
+	private void persistFolder(File file) {
+		fileChooser.setInitialDirectory(file.getParentFile());
 	}
 
 	private void onNew(ActionEvent event) {
@@ -217,7 +225,7 @@ public class MarkDownEditor extends Application {
 		if ((Boolean) tab.getProperties().get(CHANGED)) {
 			if (tab.getText().equals(NEW_FILE)) {
 				File file = fileChooser.showOpenDialog(null);
-				fileChooser.setInitialDirectory(file.getParentFile());
+				persistFolder(file);
 				if (file != null) {
 					saveContentToFile(tab, file);
 					tab.getProperties().put(FILE, file);
@@ -241,7 +249,7 @@ public class MarkDownEditor extends Application {
 	}
 
 	@Override
-	public void init() throws Exception {
+	public void init() {
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Markdown", "*.md", "*.markdown", "*.MD"));
 		fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All files", "*.*"));
 	}
