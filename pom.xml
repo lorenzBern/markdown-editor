@@ -32,6 +32,9 @@
                         <jvmArg>-Dfile.encoding=UTF-8</jvmArg>
                     </jvmArgs>
                     <vendor>Webruler GmbH</vendor>
+                    <bundleArguments>
+                        <icon>${project.basedir}/src/main/resources/md.png</icon>
+                    </bundleArguments>
                 </configuration>
                 <executions>
                     <execution>
